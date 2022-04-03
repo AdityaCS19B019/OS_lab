@@ -1,5 +1,7 @@
 {
     "files.associations": {
         "istream": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false,
+    "workbench.colorTheme": "Abyss"
 }
