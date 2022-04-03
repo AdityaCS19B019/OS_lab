@@ -95,7 +95,7 @@ int main()
       if (option == 1)
       {
           cout << " ### Login with your FreeBSD account to proceed ######" << endl;
-          system("login");
+         // system("login");
          int id;
          id = getuid();
          // id = 100000;
