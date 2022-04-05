@@ -1,6 +1,5 @@
             Faculty1 Faculty2 Faculty3 Faculty4 Total 
- Student1      4        0        0        0      04   
- Student2      0        6        3        3      12   
- Student3      0        0        5        0      05   
- Student4      9        -        -        -      09   
- 
+ Student1      8        0        0        0      08    
+ Student2      0        0        0        0      00   
+ Student3      0        0        0        0      00   
+ Student4      0        0        0        0      00    

@@ -73,9 +73,13 @@ struct editorConfig {
   int row_count;
   int col_count;
   
-  int arr[4][5];
-  int arr_mod[4][5];
-  int prev ;
+  char arr[4][4];
+  int arr_sum[4];
+  char arr_mod[4][5];
+
+  int total;
+  char prev  ;
+  char present;
   int modified;
 
   int activeX;
@@ -320,15 +324,15 @@ void editorInsertRow(int at, char *s, size_t len) {
     int sum = 0 ;
     for(int  i = 0 ; i < len ; i++){
       if(index == 4){
-        E.arr[E.numrows - 1][index] = sum ;
+        E.arr_sum[E.numrows - 1] = sum ;
         break;
       }
       if(i >  10 && s[i] > 47 && s[i] < 58){
-        E.arr[E.numrows - 1][index++] = s[i] - 48;
+        E.arr[E.numrows - 1][index++] = s[i] ;
         sum += s[i] - 48;
       }
       else if( i >  10 && s[i] == 45){
-        E.arr[E.numrows - 1][index++] = 0;
+        E.arr[E.numrows - 1][index++] = s[i] ;
       }
     }
   }
@@ -773,6 +777,7 @@ void editorProcessKeypress() {
     case '\r':
  
     if(E.edit == 0){
+      editorSetStatusMessage("\u001b[32mPlease Enter the Marks\u001b[0m or \u001b[31mPress Esc to return back\u001b[0m");
       E.edit = 1;
       E.activeX = E.cx;
       editorUpdateHighlight(&E.row[E.cy]);
@@ -787,26 +792,79 @@ void editorProcessKeypress() {
     }
     else{
       if(E.modified){
+            
+            
+            int temp = 0;
+
+            if(E.arr[E.cy-1][(E.cx -15)/9] == '-') {
+              temp =  E.arr[E.cy-1][(E.cx -15)/9] - 45;
+            }
+            else{
+              temp =  E.arr[E.cy-1][(E.cx -15)/9] - 48;
+            }
+
+            E.arr[E.cy-1][(E.cx -15)/9] =  E.present ;
+            E.arr_mod[E.cy-1][(E.cx -15)/9] = 1;
+
+            E.total = 0;
+
+            if(E.present == '-') {
+                E.total  = E.arr_sum[E.cy-1] - temp + E.arr[E.cy-1][(E.cx -15)/9]-45 ;
+            }
+            else{
+              E.total  = E.arr_sum[E.cy-1] - temp + E.arr[E.cy-1][(E.cx -15)/9]-48 ;
+            }
+            
+            E.arr_sum[E.cy-1] = E.total;
+
+            int cx = E.cx;
+
+            E.cx =51;
+
+            if(E.total > 9){
+              int a = E.total/10;
+              int b = E.total%10;
+
+              editorDelChar();
+              editorDelChar();
+
+              editorInsertChar(a+48);
+              editorInsertChar(b+48);
+
+            }
+            else{
+              int a = 0;
+              int b = E.total;
+
+              editorDelChar();
+              editorDelChar();
+
+              editorInsertChar(a+48);
+              editorInsertChar(b+48);
+            }
+            E.cx = cx;
+
+
           E.cx--;
           E.edit = 0;
           E.activeX = 0;
           editorUpdateHighlight(&E.row[E.cy]);
-          editorSetStatusMessage(" ");
+          editorSetStatusMessage("\u001b[32mMarks are updated\u001b[0m");
           editorSave();
           
       }
       else{
-        editorSetStatusMessage("Please Enter valid marks");
+        editorSetStatusMessage("\u001b[31mPlease Enter valid marks\u001b[0m");
       }
       break;
     }
 
       
 
-    case CTRL_KEY('a'):
+    case CTRL_KEY('q'):
       if (E.dirty && quit_times > 0) {
-        editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-          "Press Ctrl-Q %d more times to quit.", quit_times);
+        editorSetStatusMessage("\u001b[31mMarks are unsaved. Press ENTER to Save or "
+          "Ctrl-Q %d more times to quit.\u001b[0m", quit_times);
         quit_times--;
         return;
       }
@@ -834,11 +892,14 @@ void editorProcessKeypress() {
       if(E.edit == 1)
       {
         editorDelChar();
-        editorInsertChar(E.prev+48);
+        editorInsertChar(E.prev);
         E.modified = 0;
         E.edit =0;
         editorUpdateHighlight(&E.row[E.cy]);
+        E.cx--;
+        editorSave();
       }
+      editorSetStatusMessage(" ");
       break;
 
     // case CTRL_KEY('f'):
@@ -932,46 +993,19 @@ void editorProcessKeypress() {
         case '-' :
           if(E.edit){
 
-            int temp = E.arr[E.cy-1][(E.cx -15)/9] ;
-           
-            if( c == '-')
-              E.arr[E.cy-1][(E.cx -15)/9] =  0;
-            else
-              E.arr[E.cy-1][(E.cx -15)/9] =  c - 48;
-            E.arr_mod[E.cy-1][(E.cx -15)/9] = 1;
+            editorSetStatusMessage("Press \u001b[32mEnter\u001b[0m to save the Marks or Press \u001b[31mEsc\u001b[0m to return back");
+
+            E.present = c;
+            
+            
 
             editorDelChar();
             editorInsertChar(c);
-
-            int total = E.arr[E.cy-1][4] - temp + E.arr[E.cy-1][(E.cx -15)/9] ;
-            E.arr[E.cy-1][4]  = total;
-
-            int cx = E.cx;
-
-            E.cx =51;
-
-            if(total > 9){
-              int a = total/10;
-              int b = total%10;
-
-              editorDelChar();
-              editorDelChar();
-
-              editorInsertChar(a+48);
-              editorInsertChar(b+48);
-
-            }
-            else{
-              int a = 0;
-              int b = total;
-
-              editorDelChar();
-              editorDelChar();
-
-              editorInsertChar(a+48);
-              editorInsertChar(b+48);
-            }
-            E.cx = cx;
+            
+            
+            // editorSetStatusMessage("Total : %d arr_sum[E.cy-1] : %d  temp : %d E.arr[E.cy-1][(E.cx -15)/9] : %d ", E.total ,E.arr_sum[E.cy-1], E.arr[E.cy-1][(E.cx -15)/9] - 48, E.arr[E.cy-1][(E.cx -15)/9]);
+            
+            
             E.modified = 1;
           }
 
@@ -984,12 +1018,7 @@ void editorProcessKeypress() {
       switch (c) {
 
             case CTRL_KEY('q'):
-              // if (E.dirty && quit_times > 0) {
-              //     editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-              //     "Press Ctrl-Q %d more times to quit.", quit_times);
-              //     quit_times--;
-              //     return;
-              // }
+
               write(STDOUT_FILENO, "\x1b[2J", 4);
               write(STDOUT_FILENO, "\x1b[H", 3);
               exit(0);
@@ -1026,11 +1055,14 @@ void initEditor() {
 
   E.row_count = 0;
   E.col_count= 0;
+  E.present = '-';
 
   E.editAccess = 1;
   E.edit = 0;
-  E.prev = 0;
+  E.prev = '-';
   E.modified = 0;
+
+  E.total= 0;
 
   E.activeX = 0;
   E.activeY = 0;
