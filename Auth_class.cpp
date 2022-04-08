@@ -116,11 +116,11 @@ int main()
          cout << " ### Login with your FreeBSD account to proceed ######" << endl;
          // system("login");
          int id;
-         // id = getuid();
-         id = 100000;
+         id = getuid();
+         //id = 100000;
          int gid;
-         // gid = getgid();
-         gid = 1003;
+         gid = getgid();
+         //gid = 1003;
          cout << id << endl;
          cout << "### validating your freebsd account #######" << endl;
          auth.validate(id, gid);
