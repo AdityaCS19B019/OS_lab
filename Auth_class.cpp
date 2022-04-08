@@ -93,6 +93,8 @@ public:
       if (flag == 0)
       {
          cout << "### Your account didnot have access to the machine" << endl;
+         cout << "Kindly login with another account" << endl;
+         system("login");
       }
    }
 };
