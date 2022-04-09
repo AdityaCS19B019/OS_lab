@@ -1,7 +1,14 @@
-proc:::start
+proc:::exec
 / gid == $1 /
 {
-	self->start = timestamp;
+	printf("%s \n\n", execname);
+	/* self->start = timestamp; */
+}
+
+syscall::read:
+{
+
+	printf("%s	%s \n\n", execname, stringof(copyin(arg1, arg2)));
 }
 
 syscall:::entry
@@ -26,10 +33,10 @@ syscall::close:return
 }
 
 proc:::exit
-/ gid == $1 && self->start /
+/ gid == $1 /
 {
-	@[execname] = quantize(timestamp-self->start);
-	self->start = 0;
+/*	@[execname] = quantize(timestamp-self->start);
+	self->start = 0;   */
 	printf("\n\n");
 }
 
