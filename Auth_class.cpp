@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdio>
-//#include <unistd.h>
+#include <unistd.h>
 #include <vector>
 #include <fstream>
 #include <string.h>
@@ -117,7 +117,7 @@ int main()
          // system("login");
          int id;
          id = getuid();
-         //id = 100000;
+         id = 100000;
          int gid;
          gid = getgid();
          //gid = 1003;
