@@ -37,7 +37,7 @@ syscall::open:entry
 syscall::close:entry
 / gid == $1 /
 {
-	printf("the process %s with the pid %d  has opened a file for %d sec\n\n", execname, pid, (timestamp-start)/1000000000);
+	printf("the process %s with the pid %d  has opened a file for %d nanosec\n\n", execname, pid, (timestamp-start));
 }
 
 proc:::exit
