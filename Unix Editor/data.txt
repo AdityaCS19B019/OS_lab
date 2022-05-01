@@ -1,5 +1,5 @@
-    | A | B | C | D | Total
- a  | 6 | 4 | 4 | 3 | 17 
- b  | 7 | 5 | 7 | 3 | 22 
- c  | 0 | 5 | 3 | 3 | 11 
- d  | 1 | 1 | 2 | 3 | 07 
+            Faculty1 Faculty2 Faculty3 Faculty4 Total  
+ Student1      8        0        0        0      08    
+ Student2      0        0        0        0      00    
+ Student3      0        0        0        5      05    
+ Student4      0        0        0        0      00    

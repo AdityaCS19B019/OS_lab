@@ -1,4 +1,7 @@
 compile :
-	g++ Amigo_Editor.cpp && ./a.out temp.txt
+	g++ main.cpp Marksheet.cpp
+
+run : a.out 
+	./a.out
 clean :
 	rm a.out
