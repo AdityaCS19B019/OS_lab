@@ -16,6 +16,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <vector>
+#include <fstream>
+#include <string>
 
 
 using namespace std;
@@ -27,6 +29,6 @@ using namespace std;
 
 void Dean();
 void Student(string arg1);
-void Faculty(string arg1);
+void Faculty(string arg1, string arg2);
 
 #endif

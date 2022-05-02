@@ -1,4 +1,5 @@
-            Faculty3  
- Student1      8      
- Student2      3       
- Student3      3      
+3  // cursor y position
+1  // edit mode
+0  // modified
+3  // prev value
+4  // present value 

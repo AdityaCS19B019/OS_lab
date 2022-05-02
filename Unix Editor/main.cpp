@@ -20,7 +20,7 @@ int main(){
         case 2 :
             // cout << "Enter Faculty ID : \n";
             // cin >> rc;
-            Faculty("buf.txt");
+            Faculty("Faculty3.log", "Faculty3_Display.txt");
             break;
         case 3 :
             Student("buf.txt");

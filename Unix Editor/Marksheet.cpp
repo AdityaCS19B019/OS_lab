@@ -64,9 +64,8 @@ struct editorConfig {
   int activeY;
 
 
-  int option ; 
-  int maxVertical ;
-  int maxHorizontal ;
+  int option ;
+  char* logFile; 
 };
 
 struct editorConfig E;
@@ -317,26 +316,6 @@ void editorInsertRow(int at, char *s, size_t len) {
         }
     }
   }
-
-  // TODO : change the array read  
-  // if(E.numrows > 0 && E.numrows < 5){
-  //   int index = 0;
-  //   int sum = 0 ;
-  //   for(int  i = 0 ; i < len ; i++){
-  //     if(index == 4){
-  //       E.arr_sum[E.numrows - 1] = sum ;
-  //       break;
-  //     }
-  //     if(i >  10 && s[i] > 47 && s[i] < 58){
-  //       E.arr[E.numrows - 1][index++] = s[i] ;
-  //       sum += s[i] - 48;
-  //     }
-  //     else if( i >  10 && s[i] == 45){
-  //       E.arr[E.numrows - 1][index++] = s[i] ;
-  //     }
-  //   }
-  // }
-
 
 
   E.row[at].rsize = 0;
@@ -813,14 +792,13 @@ void editorProcessKeypress() {
             E.activeX = E.cx;
 
             E.prev = E.arr[E.cy];
+            E.present = ' ';
 
             editorUpdateHighlight(&E.row[E.cy]);
             E.cx++;
             editorDelChar();
             editorInsertChar(' ');
             E.modified = 0;
-
-            break;
 
           }
           else{
@@ -836,9 +814,10 @@ void editorProcessKeypress() {
             }
             else{
               editorSetStatusMessage("\u001b[31mPlease Enter valid marks\u001b[0m");
+              E.present = ' ';
             }
-            break;
           }
+          break;
           
         case '\033' :
             if(E.edit == 1)
@@ -924,6 +903,18 @@ void editorProcessKeypress() {
               break;
         
       }
+      break;
+
+    default :
+      switch(c){
+            case CTRL_KEY('q'):
+            case CTRL_KEY('a'):
+              write(STDOUT_FILENO, "\x1b[2J", 4);
+              write(STDOUT_FILENO, "\x1b[H", 3);
+              exit(0);
+              break;
+      }
+      break;
 
 
   }
@@ -1104,22 +1095,138 @@ void Student(string arg1) {
 
 }
 
-void Faculty(string arg1) {
+void WriteLog(char* logFile){
+  string str = "";
+  str += to_string(E.cy) + '\n';
+  str += to_string(E.edit) + '\n';
+  str += to_string(E.modified ) + '\n';
+  char temp = E.prev - 48 ;
+  str += to_string(temp) + '\n';
+  char temp2 ;
+  if(E.present == ' '){
+     str += " \n";
+  }
+  else{
+    temp2= E.present -48;
+    str += to_string(temp2) + '\n';
+
+  }
+  
+      char* s = const_cast<char*>(str.c_str());
 
 
-      enableRawMode();
+  // editorSetStatusMessage(s);
+
+
+  int len = str.length();
+
+
+  int fd1;
+  char buf[len+1];
+  strcpy(buf, str.c_str());
+
+    fd1 = open(logFile, O_WRONLY);
+    if (fd1 == -1) {
+        perror(logFile);
+        exit(-1);
+    }
+
+
+    write(fd1, buf, strlen(buf)); /* fd1 is the file descriptor, buf is the character array used to
+ hold the data, strlen(buf) informs the function that the number of bytes equal to the length of the
+ string in the buffer need to be copied */
+
+    close(fd1);
+}
+
+void Faculty(string arg1,string arg2) {
+
       initEditor();
 
       E.option = 2;
 
-      char* c = const_cast<char*>(arg1.c_str());
+      char* c = const_cast<char*>(arg2.c_str());
+      enableRawMode();
       editorOpen(c);
+
+      char* file = const_cast<char*>(arg1.c_str());
+
+      int fd = open(file, O_RDWR , 0644);
+      if (fd == -1) {
+          perror("Error! Unable to open log file");
+		      exit(0);
+      }
+
+      char buf[100] = {'\0'};
+
+      int rd = read(fd, buf, 100 );
+      close(fd);
+
+      if(rd == -1){
+        perror("Error! Unable to read  log file");
+        exit(1);
+      }
+
+      string s = "";
+      int index = 2;
+      for(int i =0 ; i < 100 && buf[i] != '\0'; i++){
+        if(buf[i] == '\n'){
+           s += '\0';
+
+          switch (index){
+            case 2 :
+              E.cy = stoi(s);
+              break;
+            case 3 :
+              E.editAccess = 1;
+              E.edit = stoi(s);
+              if(E.edit){
+                    editorSetStatusMessage("\u001b[32mPlease Enter the Marks\u001b[0m or \u001b[31mPress Esc to return back\u001b[0m");
+                    E.edit = 1;
+                    E.activeX = E.cx;
+
+                    editorUpdateHighlight(&E.row[E.cy]);
+                    E.cx++;
+                    editorDelChar();
+                    editorInsertChar(' ');
+                    E.modified = 0;
+              }
+              break;
+            case 4 : 
+              E.modified = stoi(s);
+              break;
+            case 5 :
+              if(E.edit && !E.modified){
+                E.prev = s[0];
+              }
+              break;
+            case 6 :
+              if(E.edit && E.modified){
+                E.present = s[0];
+                editorDelChar();
+                editorInsertChar(E.present);
+              }
+              break;
+            case 7 :
+              break;
+            default :
+              break;
+          }
+          s = "";
+          index ++;
+        }
+        else{
+          s += buf[i];
+        }
+      }
+
       
       editorSetStatusMessage("\u001b[31mHELP\u001b[0m : Ctrl- q = quit, ENTER : Edit , ESC : Retain Previous value");
 
       while (1) {
         editorRefreshScreen();
         editorProcessKeypress();
+        WriteLog(file);
       }
 
 
