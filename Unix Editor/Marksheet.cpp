@@ -63,6 +63,8 @@ struct editorConfig {
   int activeX;
   int activeY;
 
+  int rc;
+
 
   int option ;
   char* logFile; 
@@ -79,6 +81,215 @@ void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
 char *editorPrompt(char *prompt, void (*callback)(char *, int));
 
+/*** update main file ***/
+
+
+void update_total()
+{
+    fstream file;
+    file.open("data.txt");
+    string line = "", LINE = "", start ="";
+
+    if(file.is_open())
+    {   
+        string s;
+        int i=0;
+        
+        while(getline(file,s))
+        {   
+            if(i++==0)
+            {
+                line += s + "       \n";
+                continue;
+            }
+
+            char s1[s.size()+1];
+            strcpy(s1, s.c_str());
+            char* token = strtok(s1, " "); 
+
+            vector<string> tokens;
+            while (token != NULL)
+            {
+                tokens.push_back(token);
+                token = strtok(NULL, " ");
+            }     
+
+            tokens.pop_back();  
+            
+            int totalsum = 0;
+            line += " " + tokens[0] + "      ";
+            string temp = "";
+            for (int y=1;y<tokens.size();y++)
+            {   
+
+                line += tokens[y] + "        ";
+                // temp += tokens[y] + "        ";
+                if(tokens[y] != "-"){
+                    totalsum += tokens[y][0] - 48;
+                }
+
+                // stringstream geek(tokens[y]);
+                // int x = 0;
+                // geek >> x;
+                // totalsum += x ;
+            }
+
+            // editorSetStatusMessage( const_cast<char*>(temp.c_str()));
+
+            
+            if(totalsum < 10){
+                line += "0" + to_string(totalsum)  + "       \n";
+            } 
+            else{
+                line += to_string(totalsum) + "       \n";
+            }
+
+        }
+    }    
+
+    ofstream myfile("data.txt");
+    myfile << line;
+    myfile.close();
+        
+    cout << line;
+    
+}
+
+void save_table(int a, int b)
+{
+    fstream file1;
+    fstream file2;
+    file1.open("data.txt");
+    file2.open(E.filename);
+    string line = "", LINE = "", start ="";
+
+    if(a==1)
+    {   
+        // just catch that LINE from updated file 
+        if(file2.is_open())
+        {
+            string s;
+            int i=0;
+            while(getline(file2,s)) 
+            { 
+                if(i==1)
+                  LINE += s + "\n"; 
+                i++;  
+            }
+        }
+
+        if(file1.is_open())
+        {
+            string s;
+            int i=0;
+            while(getline(file1,s))
+            {
+                if(i==b)
+                   line += LINE ; 
+                else
+                   line += s +"\n"; 
+                i++;  
+            }
+        }
+
+        ofstream myfile("data.txt");
+	    myfile << line;
+	    myfile.close();
+        //cout << line;
+
+    }
+
+    else if(a==0)
+    {   
+        vector<string> newcol;
+        if(file2.is_open()) // Collecting updated values in a vector
+        {   
+            string s;
+            int i=0;
+            
+            while(getline(file2,s))
+            {    
+
+                char s1[s.size()+1];
+                strcpy(s1, s.c_str());
+                char* token = strtok(s1, " "); 
+
+                vector<string> tokens;
+                while (token != NULL)
+                {
+                    tokens.push_back(token);
+                    token = strtok(NULL, " ");
+                }
+
+                if(tokens.size()>1)
+                newcol.push_back(tokens[1]);
+            }
+        }
+
+
+        if(file1.is_open())
+        {
+            string s;
+            int i=0,flag=0;
+            while(getline(file1,s)) 
+            {   
+                if(i==0)
+                  line += s +"\n" ; 
+
+                else
+                {   
+                    char s1[s.size()+1];
+                    strcpy(s1, s.c_str());
+                    char* token = strtok(s1, " ");
+
+                    vector<string> tokens;
+                    while (token != NULL)
+                    {
+                        tokens.push_back(token);
+                        token = strtok(NULL, " ");
+                    }
+                    
+                    line += " " + tokens[0] + "      " ;
+                    
+                    int j=1;
+                    while(j<tokens.size())
+                    {
+                        if(j==b){
+                          if(j==1){
+                              line += newcol[flag++] ;
+
+                          }
+                          else{
+                             line += "        " + newcol[flag++] ;
+
+                          }
+                        }
+                        else  {
+                            if(j==1){
+                              line += tokens[j];
+                          }
+                          else{
+                             line += "        " + tokens[j];
+                          }
+                        }
+                        j++;
+                    } 
+                    line += "\n";
+
+                }  
+                i++;  
+            }
+        }        
+    }
+
+    ofstream myfile("data.txt");
+    myfile << line;
+    myfile.close();
+    
+    update_total();
+        
+    //cout << line;
+}
 
 
 /*** terminal ***/
@@ -480,6 +691,7 @@ void editorSave() {
         close(fd);
         free(buf);
         E.dirty = 0;
+        save_table(0, E.rc);
         return;
       }
     }
@@ -1040,6 +1252,8 @@ void initEditor() {
 
   E.option = 0;
 
+  E.rc = -1;
+
   if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
   E.screenrows -= 2;
 }
@@ -1125,7 +1339,7 @@ void WriteLog(char* logFile){
   char buf[len+1];
   strcpy(buf, str.c_str());
 
-    fd1 = open(logFile, O_WRONLY);
+    fd1 = open(logFile, O_RDWR | O_CREAT, 0644);
     if (fd1 == -1) {
         perror(logFile);
         exit(-1);
@@ -1139,9 +1353,10 @@ void WriteLog(char* logFile){
     close(fd1);
 }
 
-void Faculty(string arg1,string arg2) {
+void Faculty(string arg1,string arg2, int rc) {
 
       initEditor();
+      E.rc = rc;
 
       E.option = 2;
 
@@ -1152,11 +1367,8 @@ void Faculty(string arg1,string arg2) {
       char* file = const_cast<char*>(arg1.c_str());
 
       int fd = open(file, O_RDWR , 0644);
-      if (fd == -1) {
-          perror("Error! Unable to open log file");
-		      exit(0);
-      }
-
+      if (fd != -1) {
+         
       char buf[100] = {'\0'};
 
       int rd = read(fd, buf, 100 );
@@ -1218,6 +1430,8 @@ void Faculty(string arg1,string arg2) {
         else{
           s += buf[i];
         }
+      }
+
       }
 
       

@@ -4,9 +4,6 @@
 #include<fstream>
 #include<iostream>
 using namespace std;
-#include "Marksheet.h"
-
-
 
 
 void add_student(string x, int a, int b, int c, int d)
@@ -38,10 +35,9 @@ string read_num(string s)
     string str = myText;
     return str;
     }
+
     // Close the file
     MyReadFile.close();
-
-    return "";
 }
 
 void change_num(string s)
@@ -89,7 +85,6 @@ string get_filestatus(int n)
               //cout << s[2] << endl;
         }
     }           
-    return "";
 }
 
 void change_filestatus(int n,int m)
@@ -228,7 +223,7 @@ void present_column(int n)
     string line = "";
     fstream file; 
     
-	file.open("data.txt"); 
+	file.open("table.txt"); 
 	if (file.is_open())
 	{
 		string s, str="";   
@@ -265,14 +260,13 @@ void present_column(int n)
                 //     str +=  "         " ;
                 //     j--;
                 // }
-                str += tokens[n] + "       ";
+                str += tokens[n] ;
                 str += "\n";
             }
             
             i++;
         }
-        string file_name = "Faculty"+ to_string(n) + "_Display.txt";
-        ofstream myfile(file_name);
+        ofstream myfile("buffer.txt");
 	    myfile << str;
 	    myfile.close();
     }    
@@ -280,40 +274,175 @@ void present_column(int n)
 
 
 
-int main(){
+void save_table(int a, int b)
+{
+    fstream file1;
+    fstream file2;
+    file1.open("table.txt");
+    file2.open("buffer.txt");
+    string line = "", LINE = "", start ="";
 
-    int option = 2;
-    int rc = 0;
-    string str1 , str2;
-    
+    if(a==1)
+    {   
+        // just catch that LINE from updated file 
+        if(file2.is_open())
+        {
+            string s;
+            int i=0;
+            while(getline(file2,s)) 
+            { 
+                if(i==1)
+                  LINE += s + "\n"; 
+                i++;  
+            }
+        }
 
-    // cout << "Press 1 to Dean or Press 2 to faculty or press 3 for Student\n";
-    // cin >> edit ;
+        if(file1.is_open())
+        {
+            string s;
+            int i=0;
+            while(getline(file1,s))
+            {
+                if(i==b)
+                   line += LINE ; 
+                else
+                   line += s +"\n"; 
+                i++;  
+            }
+        }
 
-    switch (option){
-        case 1 :
-            Dean();
-            break;
-        case 2 :
-            cout << "Enter Faculty ID : \n";
-            cin >> rc;
-           present_column(rc);
-          
-           str1 = "";
-           str1 += "Facuty" + to_string(rc) + ".log";
-           str2 = "";
-           str2 += "Faculty" + to_string(rc) + "_Display.txt";
-        //    Faculty("Faculty1.log", "Faculty1_Display.txt");  
-           Faculty(str1 , str2, rc);
-           break;
-        case 3 :
-            Student("buf.txt");
-            break;
-        default :
-            cout << " Invalid Option Choosen \n";
-            break;
+        ofstream myfile("table.txt");
+	    myfile << line;
+	    myfile.close();
+        //cout << line;
+
     }
 
+    else if(a==0)
+    {   
+        vector<string> newcol;
+        if(file2.is_open()) // Collecting updated values in a vector
+        {   
+            string s;
+            int i=0;
+            
+            while(getline(file2,s))
+            {    
+
+                char s1[s.size()+1];
+                strcpy(s1, s.c_str());
+                char* token = strtok(s1, " "); 
+
+                vector<string> tokens;
+                while (token != NULL)
+                {
+                    tokens.push_back(token);
+                    token = strtok(NULL, " ");
+                }
+
+                if(tokens.size()>1)
+                newcol.push_back(tokens[1]);
+            }
+        }
+
+        // for(int i=0;i<newcol.size();i++)
+        // {
+        //     cout << newcol[i] << "*";
+        // }
+
+
+        if(file1.is_open())
+        {
+            string s;
+            int i=0,flag=0;
+            while(getline(file1,s)) 
+            {   
+                if(i==0)
+                  line += s +"\n" ; 
+
+                else
+                {   
+                    char s1[s.size()+1];
+                    strcpy(s1, s.c_str());
+                    char* token = strtok(s1, " ");
+
+                    vector<string> tokens;
+                    while (token != NULL)
+                    {
+                        tokens.push_back(token);
+                        token = strtok(NULL, " ");
+                    }
+                    
+                    line += " " + tokens[0] + "      " ;
+                    
+                    int j=1;
+                    while(j<tokens.size())
+                    {
+                        if(j==b)
+                          line += newcol[flag++] + "        ";
+                        else  
+                          line += tokens[j] + "        "; 
+                        j++;
+                    } 
+                    line += "\n";
+
+                }  
+                i++;  
+            }
+        }        
+    }
+
+    ofstream myfile("table.txt");
+    myfile << line;
+    myfile.close();
+    
+    update_total();
+        
+    //cout << line;
 }
 
 
+
+
+int main()
+{
+    //---------------Reading 1 or 0 in "login.txt", Changing to 0 or 1 --------------------
+                 
+        // cout << read_num("login.txt") << "*";
+        // change_num("login.txt");
+        // cout << read_num("login.txt") << endl;
+
+    //----------------------------------------------------  
+
+        // cout << get_filestatus(4) << "*";
+        // change_filestatus(4,7);
+        // cout << get_filestatus(4) << endl;
+
+    //----------------------------------------------------
+
+        // add_to_queue(6,1,2,3,4);
+
+        // vector<int> arrby4 = pop_queue();
+
+        // for (auto i = arrby4.begin(); i != arrby4.end(); ++i)
+        //     cout << *i << " ";
+        
+        // cout << endl << arrby4[1];    
+
+    //-----------------------------------------------------    
+        
+        //add_student("CS19B032", 3,6,9,4);
+        
+        
+        //present_row(3);
+        //present_column(4);
+        
+    //-----------------------------------------------------
+
+        //save_table(1,3);  // Row = 1, Column = 0
+        //save_table(0,4); 
+        //save_table(0,3); 
+
+    //-----------------------------------------------------    
+   
+}
