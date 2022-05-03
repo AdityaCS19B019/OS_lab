@@ -1283,17 +1283,53 @@ void Dean() {
 
 }
 
-void Student(string arg1) {
+void present_row(int n)
+{
+    string line = "";
+    fstream file; 
+
+	file.open("data.txt"); 
+	if (file.is_open())
+	{
+		string s, str="" ;   
+        int i=0;   
+		while(getline(file, s))
+		{ 
+            if( i != 0 )
+            {   
+                if(i==n)
+                str += s + "\n";
+
+                // if(i==n)
+                //     str += s + "\n";
+                // else
+                //     str += " Student" + to_string(i) + "\n";
+            }
+            else
+            {
+                str += s + "\n";
+            }
+            i++;
+        }
+        string str1 = "Student" + to_string(n) + ".txt";
+        ofstream myfile(str1);
+	    myfile << str;
+	    myfile.close();
+    }    
+}
 
 
+void Student(int arg1) {
+
+    string str1 , str2;
+    str1 = "Student" + to_string(arg1) + ".txt";
+    present_row(arg1);
       enableRawMode();
       initEditor();
 
-      
-
       E.option = 3;
 
-      char* c = const_cast<char*>(arg1.c_str());
+      char* c = const_cast<char*>(str1.c_str());
 
       editorOpen(c);
       

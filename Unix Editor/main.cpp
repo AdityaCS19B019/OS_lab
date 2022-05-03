@@ -189,40 +189,6 @@ vector<int> pop_queue()
 }
 
 
-void present_row(int n)
-{
-    string line = "";
-    fstream file; 
-
-	file.open("data.txt"); 
-	if (file.is_open())
-	{
-		string s, str="" ;   
-        int i=0;   
-		while(getline(file, s))
-		{ 
-            if( i != 0 )
-            {   
-                if(i==n)
-                str += s + "\n";
-
-                // if(i==n)
-                //     str += s + "\n";
-                // else
-                //     str += " Student" + to_string(i) + "\n";
-            }
-            else
-            {
-                str += s + "\n";
-            }
-            i++;
-        }
-        string str1 = "Student" + to_string(n) + ".txt";
-        ofstream myfile(str1);
-	    myfile << str;
-	    myfile.close();
-    }    
-}
 
 void present_column(int n)
 {
@@ -310,9 +276,7 @@ int main(){
         case 3 :
             cout << "Enter Student ID : \n";
             cin >> rc;
-            present_row(rc);
-            str1 = "Student" + to_string(rc) + ".txt";
-            Student(str1);
+            Student(rc);
             break;
         default :
             cout << " Invalid Option Choosen \n";

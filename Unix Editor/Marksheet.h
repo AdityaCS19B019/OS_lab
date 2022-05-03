@@ -29,7 +29,7 @@ using namespace std;
 
 
 void Dean();
-void Student(string arg1);
+void Student(int arg1);
 void Faculty(string arg1, string arg2, int rc);
 
 #endif
