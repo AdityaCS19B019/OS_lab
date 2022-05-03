@@ -1,0 +1,5 @@
+            Faculty2
+ CS19B032      9       
+ CS19B019      0       
+ CS19B016      9       
+ CS19B020      2       
