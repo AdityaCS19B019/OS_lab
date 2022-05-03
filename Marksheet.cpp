@@ -16,6 +16,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <cstdio>
 
 using namespace std;
 
@@ -1390,16 +1391,8 @@ void WriteLog(char* logFile){
     str += to_string(temp2) + '\n';
 
   }
-  
-      char* s = const_cast<char*>(str.c_str());
-
-
-  // editorSetStatusMessage(s);
-
-
+  char* s = const_cast<char*>(str.c_str());
   int len = str.length();
-
-
   int fd1;
   char buf[len+1];
   strcpy(buf, str.c_str());
@@ -1409,69 +1402,75 @@ void WriteLog(char* logFile){
         perror(logFile);
         exit(-1);
     }
-
-
-    write(fd1, buf, strlen(buf)); /* fd1 is the file descriptor, buf is the character array used to
- hold the data, strlen(buf) informs the function that the number of bytes equal to the length of the
- string in the buffer need to be copied */
-
+    write(fd1, buf, strlen(buf)); 
     close(fd1);
 }
 
 
 void present_column(int n)
 {
-    string line = "";
-    fstream file; 
-    
-	file.open("data.txt"); 
-	if (file.is_open())
-	{
-		string s, str="";   
-        int i=0;   
-		while(getline(file, s))
-		{ 
-            char s1[s.size()+1];
-			strcpy(s1, s.c_str());
-			char* token = strtok(s1, " ");
-			vector<string> tokens;
 
-            while (token != NULL)
-			{
-				tokens.push_back(token);
-				token = strtok(NULL, " ");
-			}
+    FILE *fp = fopen("data.txt", "r");
+    if (!fp) die("fopen");
 
-            if(i==0)
-            {
-                str += "            Faculty" + to_string(n) + "\n";
-                //str += s + "\n";
-            }
-            
-            else
-            {   
-                str.append(" ");
-                str.append(tokens[0]);
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
 
-                str += "      ";
-                
-                // int j=n;
-                // while(j>1)
-                // {
-                //     str +=  "         " ;
-                //     j--;
-                // }
-                str += tokens[n] + "       ";
-                str += "\n";
-            }
-            
-            i++;
-        }
-        string file_name = "Faculty"+ to_string(n) + "_Display.txt";
-        ofstream myfile(file_name);
-	    myfile << str;
-	    myfile.close();
-    }    
+   	vector <vector<string>> v;
+    string s ;
+    string data = "";
+    int line_no = 1;
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+      while (linelen > 0 && (line[linelen - 1] == '\n' ||
+                            line[linelen - 1] == '\r'))
+        linelen--;
+        s = string(line, line + linelen);
+
+        if(linelen > 0){
+              char s1[s.size()+1];
+              strcpy(s1, s.c_str());
+              char* token = strtok(s1, " ");
+
+              vector<string> tokens;
+              while (token != NULL)
+              {
+
+                tokens.push_back(string(token));
+                token = strtok(NULL, " ");
+              }
+
+              if(line_no++ == 1){
+                  data += "            Faculty" + to_string(n) + "\n";
+                  continue;
+              }
+
+			        data += " " + tokens[0] + "      " + tokens[n] + "       " + "\n";
+        }      
+    }
+    free(line);
+    fclose(fp);
+
+    cout << "Data : \n" << data ; 
+
+  int len = data.length();
+  int fd1;
+  char buf[len+1];
+  strcpy(buf, data.c_str());
+
+    string str = "Faculty" + to_string(n) + ".txt";
+    char* logFile = const_cast<char*>(str.c_str());
+ 
+
+    fd1 = open(logFile, O_RDWR | O_CREAT, 0644);
+    if (fd1 == -1 || fd1 == 0) {
+        perror("error creating logfile : ");
+        exit(-1);
+    }
+
+    write(fd1, buf, strlen(buf));
+    close(fd1);
+  
 }
 
 
@@ -1480,11 +1479,12 @@ void Faculty(int rc) {
       string str1 ,str2;
 
       str1 = "";
-      str1 += "Facuty" + to_string(rc) + ".log";
+      str1 += "Faculty" + to_string(rc) + ".log";
       str2 = "";
-      str2 += "Faculty" + to_string(rc) + "_Display.txt";
+      str2 += "Faculty" + to_string(rc) + ".txt";
 
       present_column(rc);
+
 
       initEditor();
       E.rc = rc;
@@ -1573,6 +1573,7 @@ void Faculty(int rc) {
         editorProcessKeypress();
         WriteLog(file);
       }
+      
 
 
 }

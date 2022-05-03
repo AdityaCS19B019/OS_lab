@@ -1,0 +1,2 @@
+            Faculty1 Faculty2 Faculty3 Faculty4 Total                                                                                                                                                     
+ CS19B019      0        5        -        9        14       

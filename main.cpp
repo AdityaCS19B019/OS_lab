@@ -194,13 +194,13 @@ vector<int> pop_queue()
 
 int main(){
 
-    int option = 2;
+    int option;
     int rc = 0;
     string str1 , str2;
     
 
-    // cout << "Press 1 to Dean or Press 2 to faculty or press 3 for Student\n";
-    // cin >> edit ;
+    cout << "Press 1 to Dean or Press 2 to faculty or press 3 for Student\n";
+    cin >> option ;
 
     switch (option){
         case 1 :
