@@ -1,5 +1,5 @@
             Faculty1
  Student1      8       
- Student2      5       
- Student3      7       
+ Student2      0       
+ Student3      0       
  Student4      0       

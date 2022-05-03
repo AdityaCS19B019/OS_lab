@@ -194,7 +194,7 @@ void present_row(int n)
     string line = "";
     fstream file; 
 
-	file.open("table.txt"); 
+	file.open("data.txt"); 
 	if (file.is_open())
 	{
 		string s, str="" ;   
@@ -217,7 +217,8 @@ void present_row(int n)
             }
             i++;
         }
-        ofstream myfile("buffer.txt");
+        string str1 = "Student" + to_string(n) + ".txt";
+        ofstream myfile(str1);
 	    myfile << str;
 	    myfile.close();
     }    
@@ -254,8 +255,8 @@ void present_column(int n)
             
             else
             {   
-                str.append(" Student");
-                str.append(to_string(i)) ;
+                str.append(" ");
+                str.append(tokens[0]);
 
                 str += "      ";
                 
@@ -282,7 +283,7 @@ void present_column(int n)
 
 int main(){
 
-    int option = 2;
+    int option = 3;
     int rc = 0;
     string str1 , str2;
     
@@ -307,7 +308,11 @@ int main(){
            Faculty(str1 , str2, rc);
            break;
         case 3 :
-            Student("buf.txt");
+            cout << "Enter Student ID : \n";
+            cin >> rc;
+            present_row(rc);
+            str1 = "Student" + to_string(rc) + ".txt";
+            Student(str1);
             break;
         default :
             cout << " Invalid Option Choosen \n";
