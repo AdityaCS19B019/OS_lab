@@ -1,5 +1,0 @@
-            Faculty3
- CS19B032      3       
- CS19B019      -       
- CS19B016      9       
- CS19B020      7       

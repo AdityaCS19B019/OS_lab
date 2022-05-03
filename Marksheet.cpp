@@ -1313,47 +1313,64 @@ void Dean() {
 
 }
 
-void present_row(int n)
-{
-    string line = "";
-    fstream file; 
+void getStudentData(int id){
+      FILE *fp = fopen("data.txt", "r");
+    if (!fp) die("fopen");
 
-	file.open("data.txt"); 
-	if (file.is_open())
-	{
-		string s, str="" ;   
-        int i=0;   
-		while(getline(file, s))
-		{ 
-            if( i != 0 )
-            {   
-                if(i==n)
-                str += s + "\n";
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
 
-                // if(i==n)
-                //     str += s + "\n";
-                // else
-                //     str += " Student" + to_string(i) + "\n";
-            }
-            else
-            {
-                str += s + "\n";
-            }
-            i++;
+   	vector <vector<string>> v;
+    string s ;
+    string data = "";
+    int line_no = 0;
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+      while (linelen > 0 && (line[linelen - 1] == '\n' ||
+                            line[linelen - 1] == '\r'))
+        linelen--;
+        s = string(line, line + linelen);
+        if(line_no == 0){
+          data += s +"\n";
         }
-        string str1 = "Student" + to_string(n) + ".txt";
-        ofstream myfile(str1);
-	    myfile << str;
-	    myfile.close();
-    }    
-}
 
+        if(linelen > 0){
+          if(line_no == id){
+            data += s + "\n" ;
+            break;
+          }
+          line_no++;   
+        }   
+    }
+    free(line);
+    fclose(fp);
+
+    cout << "Data : \n" << data ; 
+    int len = data.length();
+    int fd1;
+    char buf[len+1];
+    strcpy(buf, data.c_str());
+
+    string str = "Student" + to_string(id) + ".txt";
+    char* logFile = const_cast<char*>(str.c_str());
+ 
+
+    fd1 = open(logFile, O_RDWR | O_CREAT, 0644);
+    if (fd1 == -1 || fd1 == 0) {
+        perror("error creating logfile : ");
+        exit(-1);
+    }
+
+    write(fd1, buf, strlen(buf));
+    close(fd1);
+}
 
 void Student(int arg1) {
 
-    string str1 , str2;
-    str1 = "Student" + to_string(arg1) + ".txt";
-    present_row(arg1);
+      string str1 , str2;
+      str1 = "Student" + to_string(arg1) + ".txt";
+      getStudentData(arg1);
+    
       enableRawMode();
       initEditor();
 
@@ -1368,11 +1385,9 @@ void Student(int arg1) {
       while (1) {
         editorRefreshScreen();
         editorProcessKeypress();
-        // editorSetStatusMessage("\u001b[31mHELP\u001b[0m : Ctrl- q = quit");
+        editorSetStatusMessage("\u001b[31mHELP\u001b[0m : Ctrl- q = quit");
 
       }
-
-
 }
 
 void WriteLog(char* logFile){
