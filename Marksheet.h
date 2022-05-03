@@ -30,6 +30,6 @@ using namespace std;
 
 void Dean();
 void Student(int arg1);
-void Faculty(string arg1, string arg2, int rc);
+void Faculty(int rc);
 
 #endif

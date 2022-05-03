@@ -115,6 +115,11 @@ void update_total()
             }     
 
             tokens.pop_back();  
+
+            if(tokens.back().length() > 1)
+            {
+              tokens.pop_back();
+            }
             
             int totalsum = 0;
             line += " " + tokens[0] + "      ";
@@ -1389,18 +1394,84 @@ void WriteLog(char* logFile){
     close(fd1);
 }
 
-void Faculty(string arg1,string arg2, int rc) {
+
+void present_column(int n)
+{
+    string line = "";
+    fstream file; 
+    
+	file.open("data.txt"); 
+	if (file.is_open())
+	{
+		string s, str="";   
+        int i=0;   
+		while(getline(file, s))
+		{ 
+            char s1[s.size()+1];
+			strcpy(s1, s.c_str());
+			char* token = strtok(s1, " ");
+			vector<string> tokens;
+
+            while (token != NULL)
+			{
+				tokens.push_back(token);
+				token = strtok(NULL, " ");
+			}
+
+            if(i==0)
+            {
+                str += "            Faculty" + to_string(n) + "\n";
+                //str += s + "\n";
+            }
+            
+            else
+            {   
+                str.append(" ");
+                str.append(tokens[0]);
+
+                str += "      ";
+                
+                // int j=n;
+                // while(j>1)
+                // {
+                //     str +=  "         " ;
+                //     j--;
+                // }
+                str += tokens[n] + "       ";
+                str += "\n";
+            }
+            
+            i++;
+        }
+        string file_name = "Faculty"+ to_string(n) + "_Display.txt";
+        ofstream myfile(file_name);
+	    myfile << str;
+	    myfile.close();
+    }    
+}
+
+
+void Faculty(int rc) {
+
+      string str1 ,str2;
+
+      str1 = "";
+      str1 += "Facuty" + to_string(rc) + ".log";
+      str2 = "";
+      str2 += "Faculty" + to_string(rc) + "_Display.txt";
+
+      present_column(rc);
 
       initEditor();
       E.rc = rc;
 
       E.option = 2;
 
-      char* c = const_cast<char*>(arg2.c_str());
+      char* c = const_cast<char*>(str2.c_str());
       enableRawMode();
       editorOpen(c);
 
-      char* file = const_cast<char*>(arg1.c_str());
+      char* file = const_cast<char*>(str1.c_str());
 
       int fd = open(file, O_RDWR , 0644);
       if (fd != -1) {

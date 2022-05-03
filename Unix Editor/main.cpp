@@ -190,66 +190,11 @@ vector<int> pop_queue()
 
 
 
-void present_column(int n)
-{
-    string line = "";
-    fstream file; 
-    
-	file.open("data.txt"); 
-	if (file.is_open())
-	{
-		string s, str="";   
-        int i=0;   
-		while(getline(file, s))
-		{ 
-            char s1[s.size()+1];
-			strcpy(s1, s.c_str());
-			char* token = strtok(s1, " ");
-			vector<string> tokens;
-
-            while (token != NULL)
-			{
-				tokens.push_back(token);
-				token = strtok(NULL, " ");
-			}
-
-            if(i==0)
-            {
-                str += "            Faculty" + to_string(n) + "\n";
-                //str += s + "\n";
-            }
-            
-            else
-            {   
-                str.append(" ");
-                str.append(tokens[0]);
-
-                str += "      ";
-                
-                // int j=n;
-                // while(j>1)
-                // {
-                //     str +=  "         " ;
-                //     j--;
-                // }
-                str += tokens[n] + "       ";
-                str += "\n";
-            }
-            
-            i++;
-        }
-        string file_name = "Faculty"+ to_string(n) + "_Display.txt";
-        ofstream myfile(file_name);
-	    myfile << str;
-	    myfile.close();
-    }    
-}
-
 
 
 int main(){
 
-    int option = 3;
+    int option = 2;
     int rc = 0;
     string str1 , str2;
     
@@ -264,14 +209,8 @@ int main(){
         case 2 :
             cout << "Enter Faculty ID : \n";
             cin >> rc;
-           present_column(rc);
-          
-           str1 = "";
-           str1 += "Facuty" + to_string(rc) + ".log";
-           str2 = "";
-           str2 += "Faculty" + to_string(rc) + "_Display.txt";
-        //    Faculty("Faculty1.log", "Faculty1_Display.txt");  
-           Faculty(str1 , str2, rc);
+           
+           Faculty(rc);
            break;
         case 3 :
             cout << "Enter Student ID : \n";
