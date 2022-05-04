@@ -9,17 +9,52 @@ using namespace std;
 
 
 
-void add_student(string x, int a, int b, int c, int d)
+void add_student(string x)
 {
-    string filename("table.txt");
-    fstream file;
+    FILE *fp = fopen("data.txt", "r");
+    if (!fp) {
+        cout << "Unable to open file" << endl;
+        die("fopen");
+        exit(-1);
+    };
 
-    int total = a + b + c + d;
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
 
-    file.open(filename, std::ios_base::app | std::ios_base::in);
+    string s ;
+    string data = "";
+    int line_no = 0;
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+      while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
+        linelen--;
+        s = string(line, line + linelen);
 
-    if (file.is_open())
-        file << "\n " << x << "      " << a << "        " << b << "        " << c << "        " << d << "      " << total ;
+        if(linelen > 0){
+            data += s +"\n" ;
+          line_no++;   
+        }   
+    }
+    free(line);
+    fclose(fp);
+
+    data += " " + x + "      -        -        -        -        00       ";
+
+    int len = data.length();
+    int fd1;
+    char buf[len+1];
+    strcpy(buf, data.c_str());
+ 
+
+    fd1 = open("data.txt", O_RDWR | O_CREAT, 0644);
+    if (fd1 == -1 || fd1 == 0) {
+        perror("error adding user to datafile : ");
+        exit(-1);
+    }
+
+    write(fd1, buf, strlen(buf));
+    close(fd1);
+
 }
 
 
@@ -197,14 +232,26 @@ int main(){
     int option;
     int rc = 0;
     string str1 , str2;
-    
+    int t = 0;
 
     cout << "Press 1 to Dean or Press 2 to faculty or press 3 for Student\n";
     cin >> option ;
+    string sss="";
 
     switch (option){
         case 1 :
-            Dean();
+            cout << "Press 1 to add student\n";
+            cin >> t;
+            if(t) 
+            {
+                cout << "Enter name of Student\n";
+                cin >> sss;
+                cout << sss;
+                add_student(sss);
+                cout << " added student";
+            }
+            // else
+            // Dean();
             break;
         case 2 :
             cout << "Enter Faculty ID : \n";
